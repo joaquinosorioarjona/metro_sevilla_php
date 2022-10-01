@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<title>AJAX leaflet</title>
+	<title>Mapa de la red de transporte ferroviario de Sevilla</title>
 	<meta name="viewport" content="initial-scale=1,maximumscale=1,user-scalable=no" />
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
 	<style>
@@ -15,9 +15,27 @@
 	</style>
 </head>
 <body>
+	<span>
+		<form action="">
+			<div id="formulario">
+				<select name="customers" onchange="makeRequest(this.value)">
+				</select>
+			<div>
+		</form>
+	</span>
 	<div id="map"></div>
 	<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
 	<script>
+	<?php include 'lista-lineas.php'; ?>
+	//Create and append the options
+	for (var i = 0; i < array.length; i++) {
+		var el=document.querySelector("#formulario select[name='customers']");
+		var option = document.createElement("option");
+		option.setAttribute("value", array[i]);
+		option.text = array[i];
+		el.appendChild(option);
+	}
+	
 	var map = L.map('map').setView([37.392720, -5.991882], 13);
 	var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 	var puntos = L.layerGroup().addTo(map);
@@ -112,28 +130,6 @@
 	};
 	window.onload = makeRequest("Todos");
 	</script>
-	<span>
-		<form action="">
-			<select name="customers" onchange="makeRequest(this.value)">
-				<option value="Todos">Todos</option>
-				<option value="Linea 1 de Metro">Linea 1 de Metro</option>
-				<option value="Linea 2 de Metro">Linea 2 de Metro</option>
-				<option value="Linea 3 de Metro">Linea 3 de Metro</option>
-				<option value="Linea 4 de Metro">Linea 4 de Metro</option>
-				<option value="Metrocentro">Metrocentro</option>
-				<option value="Tranvía del Aljarafe">Tranvía del Aljarafe</option>
-				<option value="Tranvía de Dos Hermanas">Tranvía de Dos Hermanas</option>
-				<option value="Tranvía de Alcalá">Tranvía de Alcalá</option>
-				<option value="Tranvía del Norte">Tranvía del Norte</option>
-				<option value="Linea 1 de Cercanías">Linea 1 de Cercanías</option>
-				<option value="Linea 2 de Cercanías">Linea 2 de Cercanías</option>
-				<option value="Linea 3 de Cercanías">Linea 3 de Cercanías</option>
-				<option value="Linea 4 de Cercanías">Linea 4 de Cercanías</option>
-				<option value="Linea 5 de Cercanías">Linea 5 de Cercanías</option>
-				<option value="Linea 6 de Cercanías">Linea 6 de Cercanías</option>
-				<option value="Linea 7 de Cercanías">Linea 7 de Cercanías</option>
-</select>
-</form>
-</span>
+
 </body>
 </html>
