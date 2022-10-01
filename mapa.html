@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximumscale=1.0, user-scalable=no">
+	<title>La Línea General de Andalucía</title>
+	
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">  
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css"
+		integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
+		crossorigin="">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.13.1/mapbox-gl.min.css" />
+	<link rel="stylesheet" href="sidebar-v2-master/css/leaflet-sidebar.css" />
+	
+	<style>
+	.icon {
+		max-width: 70%;
+		max-height: 70%;
+		margin: 4px;
+	}
+	body {
+		padding: 0;
+		margin: 0;
+	}
+	html, body, #map {
+		height: 100%;
+		font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+	}
+	.container {
+		display: flex;
+	}
+	.leaflet-control {
+		margin: 0px 5px;
+	}
+	.leaflet-control-layers-expanded {
+		background: #F0FFFF none repeat scroll 0 0;
+		color: #483D8B;
+		 font: 15px Calibri, sans-serif;
+		padding: 6px 10px 6px 6px;
+	}
+	.legend {
+		background: #F0FFFF none repeat scroll 0 0;
+		color: #483D8B;
+		font: 15px Calibri, sans-serif;
+		padding: 6px;		
+		line-height: 18px;
+	} 
+	.legend i{
+		width: 18px;
+		height: 18px;
+		float: left;
+		margin-right: 2px;
+		opacity: 0.7;
+	}
+	.sidebar-header{
+		background-color: #F0FFFF;
+		color: #000000;
+	}
+	.sidebar-tabs > li.active, .sidebar-tabs > ul > li.active {
+        color: #fff;
+        background-color: #F0FFFF; 
+	}
+	.lorem {
+		font-style: italic;
+		color: #666666;
+	}
+	</style>
+</head>
+<body>
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<script src='https://unpkg.com/@turf/turf/turf.min.js'></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" ></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://unpkg.com/esri-leaflet@2.5.3/dist/esri-leaflet.js"
+		integrity="sha512-K0Vddb4QdnVOAuPJBHkgrua+/A9Moyv8AQEWi0xndQ+fqbRfAFd47z4A9u1AW/spLO0gEaiE1z98PK1gl5mC5Q=="
+		crossorigin=""></script>
+	<script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js"
+		integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA=="
+		crossorigin=""></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl/1.13.1/mapbox-gl.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-gl-leaflet/0.0.15/leaflet-mapbox-gl.min.js"></script>
+	<script src="sidebar-v2-master/js/leaflet-sidebar.js"></script>
+	<script src="https://unpkg.com/leaflet-filelayer@1.2.0"></script>
+	<script src="estaciones.js"></script>
+	<script src="linea.js"></script>
+	
+	<div id="sidebar" class="sidebar collapsed">
+	<div class="sidebar-tabs">
+	<ul role="tablist">
+		<li><a href="#home" role="tab"><i class="fa fa-map"></i></a></li>
+		<li><a href="#planos" role="tab"><i class="fa fa-calendar"></i></a></li>
+		<li><a href="#estaciones" role="tab"><i class="fa fa-list"></i></a></li>
+		<li><a href="#sevilla" role="tab"><i class="fa fa-train"></i></a></li></ul>
+	<ul role="tablist">
+		<li><a href="https://youtu.be/R5dUlt7usi4" role="tab"><i class="fa fa-youtube"></i></a></li>
+		<li><a href="https://es.wikipedia.org/wiki/Línea_Alcázar_de_San_Juan-Cádiz" role="tab"><i class="fa fa-wikipedia-w"></i></a></li>
+	</ul>
+	</div>
+	<div class="sidebar-content">
+	<div class="sidebar-pane" id="home">
+		<h1 class="sidebar-header">
+			Línea General de Andalucía
+			<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+		</h1>
+		<p>Mapa de las estaciones que transcurren por la línea de ferrocarril que conecta el Valle del Guadalquivir con el resto de España.</p>
+		<p class="lorem">La Línea General de Andalucía se construyó con el objetivo de conectar Madrid con los dos principales puertos de España del Siglo XIX: Sevilla y Cádiz. Para ello se realizó un trazado que no utilizó el camino tradicional a través de las campiñas (a cuyo paso se encontraba ciudades de gran tradición agraria, como Alcalá de Guadaira, Carmona y Écija). Por el contrario, la línea férrea se diseñó pegada al trazo del río Guadalquivir, con una orografía más favorable y un fácil suministro de agua al ferrocarril.</p>
+		<p class="lorem">Esta red nació en 1854 con el servicio entre Jerez de la Frontera y El Puerto de la María. Desde ese momento, nuevos capitales y empresas pusieron todos sus esfuerzos en completar el largo eje ferroviario desde Sevilla hasta Cádiz y los ramales de Jerez a Sanlúcar de Barrameda. El segundo espacio de actuación sería el valle del Guadalquivir. Así, en 1859 se puso en servicio una línea que unía las dos capitales más señeras del sur, Sevilla y Córdoba. El corredor ferroviario en el Valle del Guadalquivir se completaría en 1865 con la apertura de los tramos de la concesión de Córdoba a Manzanares (en la provincia de Ciudad Real), atravesando el paso histórico de Despeñaperros. Este último trazado estuvo muy vinculado a las instalaciones mineras que se desarrollaron en Linares.</p>
+		<p class="lorem">Se puede decir que la historia de Andalucía se puede observar a partir de este eje ferroviario. El viajero tiene acceso a varios conjuntos históricos catalogados como Patrimonio de la Humanidad (el casco histórico de Sevilla y el Puerto de Indias, la ciudad romana de Itálica, el conjunto monumental de Córdoba, las ruinas del complejo palacial califal Medina Azahara, y los monumentos renacentistas de Baeza y Úbeda, además del complejo portuario de Cádiz y el patrimionio de Jerez de la Frontera.</p>
+		<p class="lorem">El trazado de la Alta Velocidad Española a partir del Nuevo Acceso Ferroviario a Andalucía y la continua supresión de servicios de Media Distancia han provocado que esta línea haya caído en desuso y se hayan cerrado muchas estaciones. Sin embargo, el servicio Torre del Oro, que conecta Andalucía con Albacete, Valencia y Barcelona, usa el trazado completo de esta línea. Además, la línea de Media Distancia Cádiz-Sevilla-Córdoba-Jaén también emplea casi todo el eje ferroviario, hasta la estación de Baeza-Linares.</p>
+	</div>
+	<div class="sidebar-pane" id="planos">
+		<h1 class="sidebar-header">Los primeros planos y horarios<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+		<p><a href="images/horarios.png"><img src="images/horarios.png" alt="Guia del viagero a Sevilla 1878.png"width="360" height="560"></a>
+		<p><a href="images/mapahistorico.jpg"><img src="images/mapahistorico.jpg" alt="Atlas de los Ferrocarriles de España y Portugal de 1867.jpg"width="360" height="560"></a>
+	</div>
+	<div class="sidebar-pane" id="estaciones">
+		<h1 class="sidebar-header">Estaciones de la línea<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+		<ol><li>Santa Elena</li>
+			<li>Vilches</li>
+			<li>Linares</li>
+			<li>Baeza</li>
+			<li>Jabalquinto</li>
+			<li>Mengibar</li>
+			<li>Espeluy</li>
+			<li>Villanueva de la Reina</li>
+			<li>Andujar</li>
+			<li>Arjonilla</li>
+			<li>Marmolejo</li>
+			<li>Villa del Río</li>
+			<li>Montoro</li>
+			<li>Pedro Abad</li>
+			<li>El Carpio</li>
+			<li>Villafranca de Córdoba</li>
+			<li>Alcolea de Córdoba</li>
+			<li>Córdoba</li>
+			<li>Villarrubia de Córdoba</li>
+			<li>Almodóvar del Rìo</li>
+			<li>Posadas</li>
+			<li>Hornachuelos</li>
+			<li>Palma del Río</li>
+			<li>Peñaflor</li>
+			<li>Lora del Río</li>
+			<li>Carmona</li>
+			<li>Tocina</li>
+			<li>Brenes</li>
+			<li>La Rinconada</li>
+			<li>Sevilla Empalme</li>
+			<li>Sevilla estación de Córdoba</li>
+			<li>Sevilla estación de Cádiz</li>
+			<li>Dos Hermanas</li>
+			<li>Utrera</li>
+			<li>Las Alcantarillas</li>
+			<li>La Cabezas de San Juan</li>
+			<li>Lebrija</li>
+			<li>El Cuervo</li>
+			<li>Jerez de la Frontera</li>
+			<li>El Puerto de Santa María</li>
+			<li>Puerto Real</li>
+			<li>San Fernando</li>
+			<li>Cádiz Segunda Aguada Puntales</li>
+			<li>Cádiz</li>
+		</ol>
+	</div>
+	<div class="sidebar-pane" id="sevilla">
+		<h1 class="sidebar-header">Las estaciones de Sevilla<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+		<p class="lorem">Sevilla tuvo hasta 1992 dos estaciones de tren. No había continuidad directa entre los trazados Sevilla-Cádiz y Sevilla-Córdoba, por lo que para ir de Córdoba a Cádiz se podía hacer trasbordo en la estación de Empalme (en las afueras de Sevilla, al norte de la ciudad, donde acababa el trazado Cádiz-Sevilla), o viajar a pie entre ambas estaciones.</p>
+		<p class="lorem">Con la unificación del nuevo trazado de Alta Velocidad y la centralización de servicios en la actual estación de Santa Justa, las dos estaciones históricas se clausuraron. Actualmente, ambas estaciones han sido reconfiguradas como centros comerciales.</p>
+		<p class="lorem">La estación de Cádiz, construida en estilo neoclásico, es el actual Centro Comercial Mercado Puerta de la Carne.</p>
+		<p><a href="images/estacioncadiz.jpg"><img src="images/estacioncadiz.jpg" alt="Estación de Cádiz.jpg"width="360" height="360"></a>
+		<p class="lorem">La estación de Córdoba, construida en estilo mudéjar, es el actual Centro Comercial Plaza de Armas.</p>
+		<p><a href="images/estacioncordoba.jpg"><img src="images/estacioncordoba.jpg" alt="Estación de Córdoba.jpg"width="360" height="360"></a>
+	</div>
+	</div>
+	</div>
+	<div id="map" class="sidebar-map"></div>
+
+	<script>
+	var map = L.map('map');
+		map.setView([37.45,-4.65], 9);
+		
+	var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; OpenStreetMap contributors'
+	})
+	
+	var maptile = L.mapboxGL({
+        attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+        style: 'https://api.maptiler.com/maps/6516ccba-253a-4f2f-8920-b2828eb7d858/style.json?key=Y9KJbkXF4ObUWmvEpf6s'
+      }).addTo(map);
+	  
+	var sidebar = L.control.sidebar('sidebar').addTo(map);
+	
+	var linea = new L.GeoJSON(linea, {
+		color: "#800080"
+	}).addTo(map);
+	
+	var nmarker1 = new L.marker([37.3915,-6.002]).bindPopup("Antigua estación de Córdoba, Sevilla");
+	var nmarker2 = new L.marker([37.3831,-5.9842]).bindPopup("Antigua estación de Cádiz, Sevilla");
+    var nmarker3 = new L.marker([38.1006,-3.6315]).bindPopup("Antigua estación de Madrid, Linares");
+	var antiguas = L.layerGroup([nmarker1, nmarker2, nmarker3]);
+	
+	var sevilla_antigua = {
+		'color': "#0000FF",
+		'weight': 2,
+		'opacity': 0.6
+	};
+	var sevilla_cordoba = turf.point([-6.002, 37.3915]);
+	var buffer = turf.buffer(sevilla_cordoba, 1, {units: 'kilometers'});
+	L.geoJson(buffer, {
+		style: sevilla_antigua,
+		onEachFeature: function (feature, layer) {
+			layer.bindPopup('Buffer de 1 kilómetro sobre la estación de Córdoba de Sevilla')
+		}
+	}).addTo(map);
+	var sevilla_cadiz = turf.point([-5.9842, 37.3831]);
+	var buffer = turf.buffer(sevilla_cadiz, 1, {units: 'kilometers'});
+	L.geoJson(buffer, {
+		style: sevilla_antigua,
+		onEachFeature: function (feature, layer) {
+			layer.bindPopup('Buffer de 1 kilómetro sobre la estación de Cádiz de Sevilla')
+		}
+	}).addTo(map);
+	
+	var MarkerOptions = {
+			fillColor:"#8B0000",
+			color:"#8B0000",
+			fillOpacity: 0.8
+		};
+		
+	function getRadius(poblacion) {
+			return poblacion >= 500000  ? 30 :
+				poblacion >= 100000  ? 20 :
+				poblacion >= 50000  ? 15 :
+				poblacion >= 10000 ? 10: 
+				poblacion >= 1000 ? 5:  				
+								3;
+		};
+		
+	function estilo(feature) {
+			return{
+				radius:getRadius(feature.properties.poblacion),
+			};
+		};
+	
+	function popup(feature, layer) {
+			layer.bindPopup("<ul><h4>" +feature.properties.nombre+" </h4><li>" 
+			+feature.properties.municipio+", "+feature.properties.provincia+"</li><li>Da servicio a aproximadamente "+feature.properties.poblacion+" habitantes.</li></ul>");
+		};
+
+	var estaciones = L.geoJSON(estaciones, {
+		pointToLayer: function (feature, latlng){
+			return L.circleMarker(latlng, MarkerOptions);
+		},
+		style:estilo,
+		onEachFeature: popup
+	});
+	map.addLayer(estaciones);
+	
+	var searchControl = L.esri.Geocoding.geosearch({
+		position:'topright',
+		placeholder:'escribe la localización',
+		expanded:true
+	}).addTo(map);
+	
+	var baseLayers = {
+		"Maptile": maptile,
+		"OpenStreetsMap": osm
+	};
+	
+	var overlays = {
+		"Estaciones de tren": estaciones,
+		"Antiguas estaciones": antiguas,
+		"Línea de ferrocarril": linea
+	};
+	
+	var control = new L.control.layers(baseLayers, overlays,{collapsed:false});
+	control.addTo(map);
+	
+	var legend = L.control({position: 'bottomright'});
+			legend.onAdd = function (map) {
+		var div = L.DomUtil.create('div', 'info legend');
+		var grades = [0 ,1000, 10000, 50000, 100000, 500000];
+		var labels = ['<strong>Población cercana (número de habitantes)</strong>'];
+		var categories = ['< 1000','1001-10000','10001-50000','50001-100000','100001-500000','>500000'];
+		for (var i = 0; i < grades.length; i++) {
+			var grade = grades[i];//*0.5;
+				labels.push(
+				'<i class="circlepadding" style="width: '+Math.max(8,(7-2.2*getRadius(grade)))+'px;"></i> <i style="background: #8B0000; width: '+getRadius(grade)*2+'px; height:'+getRadius(grade)*2+'px; border-radius: 50%; margin-top: '+Math.max(0,(9-getRadius(grade)))+'px;"></i><i class="circlepadding" style="width: '+Math.max(2,(20-2*getRadius(grade)))+'px;"></i> ' + categories[i]);
+			}
+		div.innerHTML = labels.join('<br>');
+		return div;
+		};
+	legend.addTo(map);
+	
+	map.on('overlayadd', function(eventLayer){
+		if (eventLayer.name === 'Estaciones de tren'){
+			map.addControl(legend);
+		} 
+	});
+	map.on('overlayremove', function(eventLayer){
+		if (eventLayer.name === 'Estaciones de tren'){
+			map.removeControl(legend);
+		} 
+	});
+	
+	var escala = L.control.scale({ position: 'bottomleft', imperial: false, maxWidth: 200});
+		map.addControl(escala);
+		
+	var results = L.layerGroup().addTo(map);
+	searchControl.on('results', function(data){
+		results.clearLayers();
+	for (var i = data.results.length -1; i >= 0; i--) {
+		results.addLayer(L.marker(data.results[i].latlng));
+	}
+	});
+	</script>
+</body>
+</html>
