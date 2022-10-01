@@ -4,7 +4,9 @@
 	<meta charset="utf-8" />
 	<title>Mapa de la red de transporte ferroviario de Sevilla</title>
 	<meta name="viewport" content="initial-scale=1,maximumscale=1,user-scalable=no" />
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"/>
+
 	<style>
 		html {
 			height:100%; 
@@ -12,9 +14,27 @@
 			width: 700px;
 			height: 600px; 
 		}
+		.form-control{
+			width: 300px;
+			background-color: #ADD8E6;
+		}
+		.footer {
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			background-color: #ADD8E6;
+			color: white;
+			text-align: center;
+		}
+		
 	</style>
 </head>
 <body>
+<div class="container-fluid">
+  <h1>Mapa de la red de transporte ferroviario de Sevilla</h1>
+  <p>Haciendo clic sobre un punto del mapa se trasladan sus coordenadas al formulario.</p>
+  <p>El dato obtenido se envía a una base de datos para su almacenamiento.</p>
 	<span>
 		<form action="">
 			<div id="formulario">
@@ -24,7 +44,13 @@
 		</form>
 	</span>
 	<div id="map"></div>
-	<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+	<script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+	<script src='https://unpkg.com/@turf/turf/turf.min.js'></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+
 	<script>
 	<?php include 'lista-lineas.php'; ?>
 	//Create and append the options
@@ -36,8 +62,10 @@
 		el.appendChild(option);
 	}
 	
-	var map = L.map('map').setView([37.392720, -5.991882], 13);
+	var map = L.map('map').setView([37.378944, -5.980278], 12);
 	var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+	
+	
 	var puntos = L.layerGroup().addTo(map);
 	var http_request = false;
 	
@@ -116,7 +144,7 @@
 			};
 		};
 		function popup_estaciones (feature, layer) {
-			layer.bindPopup("<div style=textalign: center><h3>"+feature.properties.nombre+ "<h3></div><hr><table><tr><td>Línea: "+feature.properties.linea+ "</td></tr><tr><td>Zona: "+feature.properties.lugar+ "</td></tr></table>",
+			layer.bindPopup("<div style=textalign: center><h3>"+feature.properties.nombre+ "<h3></div><hr><table><tr><td>Línea: "+feature.properties.linea+ "</td></tr><tr><td>Zona: "+feature.properties.lugar+ "</td></tr><tr><td>Da potencial servicio a "+feature.properties.poblacion+" habitantes</td></tr></table>",
 			{minWidth: 150, maxWidth: 200});
 		};
 		var estaciones = L.geoJSON(geojson, {
@@ -129,6 +157,10 @@
 		puntos.addLayer(estaciones)
 	};
 	window.onload = makeRequest("Todos");
+	
+	var escala = L.control.scale({ position: 'bottomleft', imperial: false, maxWidth: 200});
+	map.addControl(escala);
+		
 	</script>
 
 </body>
