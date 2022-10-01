@@ -49,8 +49,8 @@
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-
-
+	<script src="lineas.js"></script>
+	
 	<script>
 	<?php include 'lista-lineas.php'; ?>
 	//Create and append the options
@@ -64,6 +64,85 @@
 	
 	var map = L.map('map').setView([37.378944, -5.980278], 12);
 	var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+		
+	function popup_lineas (feature, layer) {
+		layer.bindPopup("<div style=textalign: center><h6>"+feature.properties.linea+ "<h6></div>",
+		{minWidth: 150, maxWidth: 200});
+	};
+	
+	var metro1 = new L.GeoJSON(lineas, {
+		filter: metro1filter,
+		weight: 4,
+		color: "#008000",
+		onEachFeature: popup_lineas,
+	});
+	function metro1filter(feature) {
+		if (feature.properties.linea === "Linea 1 de Metro") return true
+	}
+	
+	var metro2 = new L.GeoJSON(lineas, {
+		filter: metro2filter,
+		weight: 4,
+		color: "#0000FF",
+		onEachFeature: popup_lineas,
+	});
+	function metro2filter(feature) {
+		if (feature.properties.linea === "Linea 2 de Metro") return true
+	}
+	
+	var metro3 = new L.GeoJSON(lineas, {
+		filter: metro3filter,
+		weight: 4,
+		color: "#FF0000",
+		onEachFeature: popup_lineas,
+	});
+	function metro3filter(feature) {
+		if (feature.properties.linea === "Linea 3 de Metro") return true
+	}
+	
+	var metro4 = new L.GeoJSON(lineas, {
+		filter: metro4filter,
+		weight: 4,
+		color: "#FFFF00",
+		onEachFeature: popup_lineas,
+	});
+	function metro4filter(feature) {
+		if (feature.properties.linea === "Linea 4 de Metro") return true
+	}
+	
+	var metro = L.layerGroup([metro1, metro2, metro3, metro4]).addTo(map);
+
+	
+	var metrocentro = new L.GeoJSON(lineas, {
+		filter: metrocentrofilter,
+		weight: 2,
+		color: "#40E0D0",
+		onEachFeature: popup_lineas
+	}).addTo(map);
+	function metrocentrofilter(feature) {
+		if (feature.properties.servicio === "metrocentro") return true
+	}
+	
+	var tranvia = new L.GeoJSON(lineas, {
+		filter: tranviafilter,
+		weight: 2,
+		color: "#DB7093",
+		onEachFeature: popup_lineas
+	}).addTo(map);
+	function tranviafilter(feature) {
+		if (feature.properties.servicio === "tranvia") return true
+	}
+	
+	var cercanias = new L.GeoJSON(lineas, {
+		filter: cercaniasfilter,
+		weight: 1,
+		color: "#8B008B",
+		onEachFeature: popup_lineas
+	}).addTo(map);
+	function cercaniasfilter(feature) {
+		if (feature.properties.servicio === "cercanias") return true
+	}
+	
 	
 	
 	var puntos = L.layerGroup().addTo(map);
@@ -113,36 +192,14 @@
 		// Creación de la capa de Leaflet
 		//Damos estilo a los marcadores;
 		var MarkerOptions = {
-			radius: 8,
-			fillColor: "#ff7800",
+			radius: 5,
+			fillColor: "#EE82EE",
 			color: "#000",
 			weight: 1,
 			opacity: 1,
 			fillOpacity: 0.8
 		};
 		
-		function colorPuntos(d) {
-			return d == "Linea 1 de Metro" ? '#FF0000' :
-			d == "Linea 2 de Metro" ? '#00FF00' :
-			d == "Linea 3 de Metro" ? '#0000FF' :
-			d == "Linea 4 de Metro" ? '#FF00FF' :
-			d == "Metrocentro" ? '#FFFF00' :
-			d == "Tranvía del Aljarafe" ? '#00FFFF' :
-			d == "Tranvía de Dos Hermanas" ? '#00FFFF' :
-			d == "Tranvía de Alcalá" ? '#00FFFF' :
-			d == "Tranvía del Norte" ? '#00FFFF' :
-							'#000000';
-		};
-		function estilo_estaciones (feature) {
-			return{
-				radius: 7,
-				fillColor: colorPuntos(feature.properties.linea),
-				color: colorPuntos(feature.properties.linea),
-				weight: 1,
-				opacity : 1,
-				fillOpacity : 0.8
-			};
-		};
 		function popup_estaciones (feature, layer) {
 			layer.bindPopup("<div style=textalign: center><h3>"+feature.properties.nombre+ "<h3></div><hr><table><tr><td>Línea: "+feature.properties.linea+ "</td></tr><tr><td>Zona: "+feature.properties.lugar+ "</td></tr><tr><td>Da potencial servicio a "+feature.properties.poblacion+" habitantes</td></tr></table>",
 			{minWidth: 150, maxWidth: 200});
@@ -151,7 +208,6 @@
 			pointToLayer: function (feature, latlng) {
 				return L.circleMarker(latlng, MarkerOptions);
 			},
-			style:estilo_estaciones,
 			onEachFeature: popup_estaciones
 		});
 		puntos.addLayer(estaciones)
