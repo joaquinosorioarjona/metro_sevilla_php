@@ -103,6 +103,7 @@
 			<form action="">
 				<div id="formulario">
 					<select name="customers" onchange="makeRequest(this.value)">
+					<option value="Todos">Todos</option>
 					</select>
 				<div>
 			</form>
@@ -392,7 +393,7 @@
 		}
 	}
 	
-	window.onload = makeRequest("Linea 1 de Metro");
+	window.onload = makeRequest("Todos");
 	
 	var baseLayers = {
 		"CARTO": carto,
