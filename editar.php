@@ -8,12 +8,12 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if($conn->connect_error) {
 	exit('Could not connect');
 }
-$query = "UPDATE estaciones SET nombre = '$_POST[nombre]', linea='$_POST[linea]', lugar='$_POST[lugar]' WHERE id = '$_POST[OGR_FID]';";
-$exec = mysqli_query($conn, $query);
-if($exec){
+$sql = "UPDATE estaciones SET nombre = '$_POST[nombre]', linea='$_POST[linea]', lugar='$_POST[lugar]' WHERE id = '$_POST[OGR_FID]';";
+$query = mysqli_query($conn, $sql);
+if($query){
 	echo "Punto modificado.";
 }else{
-	$msg = "Error: " . $query. "<br>" . mysqli_error($connection);
+	$msg = "Error: " . $sql. "<br>" . mysqli_error($connection);
 	echo $msg;
 }
 ?>

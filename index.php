@@ -29,7 +29,7 @@
 			font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
 		}#map {
 			width: 100%;
-			height: 850px; 
+			height: 890px; 
 			box-shadow: 5px 5px 5px #888;
 		}
 		.form-control{
@@ -95,9 +95,6 @@
 		<h1>Mapa de propuesta de la red completa de transporte ferroviario del Área Metropolitana de Sevilla</h1>
 	</header>
 	
-		<h6>Selecciona el radio del buffer</h6>
-	<input id="slide" type="range" min="0" max="1000" step="10" value="500" onchange="updateDiametro(this.value)">
-	
 		<div class="container-fluid" align="right">
 		<span>
 			<form action="">
@@ -109,13 +106,14 @@
 			</form>
 		</span>
 		
-	
 	<div id="sidebar" class="sidebar collapsed">
 		<div class="sidebar-tabs">
 		<ul role="tablist">
 			<li><a href="#home" role="tab"><i class="fa fa-info"></i></a></li>
 			<li><a href="#planos" role="tab"><i class="fa fa-map"></i></a></li>
 			<li><a href="#poblacion" role="tab"><i class="fa fa-users"></i></a></li>
+			<li><a href="#puntos" role="tab"><i class="fa fa-map-marker"></i></a></li>
+			<li><a href="#buffer" role="tab"><i class="fa fa-circle-o"></i></a></li>
 			<li><a href="#fuentes" role="tab"><i class="fa fa-link"></i></a></li>
 			<li><a href="https://www.youtube.com/watch?v=xx5t_-hmbQg" role="tab"><i class="fa fa-youtube"></i></a></li>
 			<li><a href="https://es.wikipedia.org/wiki/Metro_de_Sevilla" role="tab"><i class="fa fa-wikipedia-w"></i></a></li>
@@ -139,7 +137,7 @@
 		</div>
 		<div class="sidebar-pane" id="poblacion">
 		<h1 class="sidebar-header">Población<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-		<h3>El Área Metropolitana de Sevilla cuenta con una población de aproximadamente 1.548.741 habitantes según datos del INE de 2021.</h3>
+		<h4>El Área Metropolitana de Sevilla cuenta con una población de aproximadamente 1.548.741 habitantes según datos del INE de 2021.</h4>
 		<br>
 		<h5>Sevilla (total: 756.026 habitantes)</h5>
 		<ul><li>Distrito Este-Alcosa-Torreblanca: 153.678 habitantes</li>
@@ -184,8 +182,42 @@
 		<br>
 		<h5>La Rinconada: 39.204 habitantes</h5>
 		<h5>La Algaba: 16.503 habitantes</h5>
-
 		</div>
+		
+		<div class="sidebar-pane" id="puntos">
+			<h1 class="sidebar-header">Añadir estaciones<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			<h5>Haz click en el mapa para añadir una nueva estación, e introduce aquí los datos del nuevo punto:</h5>
+				<form name="form">
+					<div class="form-group">
+						<label for="nombre">Nombre:</label>
+						<input type="text" class="form-control" name="nombre" id="nombre">
+					</div>
+					<div class="form-group">
+						<label for="linea">Linea:</label>
+						<input type="text" class="form-control" name="linea" value="" id="linea">
+					</div>
+					<div class="form-group">
+						<label for="lugar">Zona:</label>
+						<input type="text" class="form-control" name="lugar" value="" id="lugar">
+					</div>
+					<div class="form-group">
+						<label for="lat">Latitud:</label>
+						<input type="text" class="form-control" name="lat" value="" id="lat">
+					</div>
+					<div class="form-group">
+						<label for="lon">Longitud:</label>
+						<input type="text" class="form-control" name="lon" value="" id="lon">
+					</div>
+					<input onclick="validacion()" type="button" value="Submit">
+				</form>
+		</div>
+		
+		<div class="sidebar-pane" id="buffer">
+			<h1 class="sidebar-header">Radio de buffer<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+			<h5>Selecciona el radio del buffer:</h5>
+			<input id="slide" type="range" min="0" max="1000" step="10" value="500" onchange="updateDiametro(this.value)">
+		</div>
+		
 		<div class="sidebar-pane" id="fuentes">
 			<h1 class="sidebar-header">Fuentes<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
 			<p><a href="https://sevillaquieremetro.org/">Sevilla Quiere Metro</a>
@@ -196,7 +228,6 @@
 	</div>
 	</div>
 	
-
 	<div id="map" class="sidebar-map"></div>
 	<script>
 	<?php include 'lista-lineas.php'; ?>
@@ -369,7 +400,7 @@
 		};
 		
 		function popup_estaciones (feature, layer) {
-			layer.bindPopup("<div style=textalign: center><h3>"+feature.properties.nombre+ "<h3></div><hr><table><tr><td>Línea: "+feature.properties.linea+ "</td></tr><tr><td>Zona: "+feature.properties.lugar+ "</td></tr><tr><td>Da potencial servicio a "+feature.properties.poblacion+" habitantes</td></tr></table><div class='container'><form action='insertar.php' method='post' name='form'><br><label for='nombre'>Nombre:</label><input type='text' name='nombre' value="+feature.properties.nombre+"><br><label for='linea'>Linea:</label><input type='text' name='linea' value="+feature.properties.linea+"><br><label for='lugar'>Zona:</label><input type='text' name='lugar' value="+feature.properties.lugar+"><br/><input type='hidden' name='gid' value="+feature.properties.gid+"> <br/><input type='submit' value='Editar datos'></form>",
+			layer.bindPopup("<div style=textalign: center><h3>"+feature.properties.nombre+ "<h3></div><hr><table><tr><td>Línea: "+feature.properties.linea+ "</td></tr><tr><td>Zona: "+feature.properties.lugar+ "</td></tr><tr><td>Da potencial servicio a "+feature.properties.poblacion+" habitantes</td></tr></table><div class='container'><form action='insertar.php' method='post' name='form'><br><label for='nombre'>Nombre:</label><input type='text' name='nombre' value="+feature.properties.nombre+"><br><label for='linea'>Linea:</label><input type='text' name='linea' value="+feature.properties.linea+"><br><label for='lugar'>Zona:</label><input type='text' name='lugar' value="+feature.properties.lugar+"><br/><input type='hidden' name='gid' value="+feature.properties.gid+"> <br/><input type='submit' value='Editar datos'></form><form action='borrar.php'method='post' name='form'> <input type='text' style='display:none'name='nombre' value= "+feature.properties.nombre+" id='nombre'><br/><input type='submit' class='button' value='Borrar punto'onclick='return alerta()'></form>",
 			{minWidth: 150, maxWidth: 200});
 		};
 		var estaciones = L.geoJSON(geojson, {
