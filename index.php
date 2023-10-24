@@ -466,7 +466,7 @@
 	
 	</script>
 	<div style=text-align:right>
-		<p style=color:white><strong>Autor: Joaquín Osorio Arjona (Doctor en Geografía, Investigador en la Universidad de Sevilla. <a href=”url”>www.joaquinosorioarjona.com</a></strong></p>	
+		<p style=color:white><strong>Autor: Joaquín Osorio Arjona (Doctor en Geografía, Profesor en la UNED). <a href=”url”>https://www.uned.es/universidad/docentes/geografia-historia/joaquin-osorio-arjona.html</a></strong></p>	
 	</div>
 </body>
 </html>
